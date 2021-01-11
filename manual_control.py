@@ -40,7 +40,7 @@ def main():
             start_counter = 1
 
         key = cv2.waitKey(1) & 0xff
-        if key == 27: # ESC
+        if key == 27 or drone.get_battery() < 10:
             drone.land()
             cv2.destroyAllWindows()
             drone.streamoff()
