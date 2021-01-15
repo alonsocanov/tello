@@ -1,4 +1,3 @@
-from djitellopy import Tello
 import cv2
 import imutils
 import numpy as np
@@ -14,17 +13,13 @@ def hsv2cvhsv(hsv: np.array) -> np.array:
     cv_hsv = np.divide((hsv * hsv_cv), hsv_orig)
     return cv_hsv
 
+
 def tolerance(dim, factor=.2):
     return np.array([dim[0] * factor, dim[1] * factor, dim[1] * .1], dtype=np.int32)
 
 def imgCenter(dim):
     return np.array([dim[0] / 2, dim[1] / 2, .15 * dim[1]], dtype=np.int32)
 
-def imgDimensions(img, factor=None):
-    h, w = img.shape[:2]
-    if not factor:
-        factor = 400 / w
-    return int(factor * w), int(factor * h)
 
 def drawTolerance(img, tolerance):
     h, w = img.shape[:2]
@@ -43,6 +38,13 @@ def drawObjectPosition(img, pos, radius):
     cv2.circle(img, pixel, int(radius), green, thickness)
     cv2.circle(img, pixel, 1, red, thickness)
 
+def imgDimensions(img, factor=None):
+    h, w = img.shape[:2]
+    if not factor:
+        factor = 400 / w
+    return int(factor * w), int(factor * h)
+   
+    
 
 def imageAnalysis(img):
     # lower and upper range of hsv color
@@ -77,40 +79,27 @@ def imageAnalysis(img):
             abs_dist = np.absolute(pixel_dist)
             if np.any(abs_dist > tol / 2):
                 unit_dist = pixel_dist / np.linalg.norm(pixel_dist)
-            
         
 
     return img, unit_dist
 
 
-def velocityChange(unit_vector, scale=70):
-    unit_vector[1] = -1 * unit_vector[1]
-    unit_vector[2] = -1 * unit_vector[2]
+def velocityChange(unit_vector, scale=10):
     return (unit_vector * scale).astype(int).tolist()
 
 
 
 def main():
 
-    start_counter = 0
+    webcam = cv2.VideoCapture(0)
+    if not webcam.isOpened():
+        webcam.release()
+        sys.exit("Error opening webcam")
 
-    drone = Tello()
-    if not drone.connect():
-        print('Unable to connecrt with drone')
-        sys.exit(0)
 
-    
-    forward_back_velocity = 0
-    left_right_velocity = 0
-    up_down_velocity = 0
-    yaw_velocity = 0
-    speed = 0
 
     
-    print(drone.get_battery().strip('dm\r\n'))
 
-    drone.streamoff()
-    drone.streamon()
 
     win_name = 'Frame'
     cv2.namedWindow(win_name)
@@ -121,29 +110,19 @@ def main():
     fontColor = (255, 255, 255)
     lineType = 2
 
-    unit_dist = np.array([0, 0, 0])
     
 
 
-    while True:
-        frame_read = drone.get_frame_read()
-        frame = frame_read.frame
+    while webcam.isOpened():
+        ret, frame = webcam.read()
 
         img, unit_vector = imageAnalysis(frame)
         
-        forward_back_velocity = 0
-        left_right_velocity = 0
-        up_down_velocity = 0
-        yaw_velocity = 0
         
-        
-
-        if start_counter == 0:
-            drone.takeoff()
-            start_counter = 1
         try:
-            yaw_velocity, up_down_velocity, forward_backward_velocity = velocityChange(unit_vector)
-            drone.send_rc_control(0, forward_backward_velocity, up_down_velocity, yaw_velocity)
+            pass
+            # yaw_velocity, up_down_velocity, forward_backward_velocity = velocityChange(unit_vector)
+            # drone.send_rc_control(0, 0, up_down_velocity, 0)
         except TypeError:
             print('Type error for velocity change output')
         
@@ -152,10 +131,8 @@ def main():
         cv2.imshow(win_name, img)
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
-            drone.land()
-            drone.streamoff()
+            webcam.release()
             cv2.destroyAllWindows()
-            
             break
 
 if __name__ == '__main__':
