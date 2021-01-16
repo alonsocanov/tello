@@ -97,17 +97,22 @@ def HaarFaceTracking(img:np.ndarray):
     drawTolerance(img, tol)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray)
-    unit_vector = np.array([0, 0, 0, 0])
+    unit_dist = np.array([0, 0, 0, 0])
     if faces:
         idx_max_area = np.argmax(faces[:, 2] * faces[:, 3])
         x, y, w, h = faces[idx_max_area, :]
-        face_center = np.array([x + int(w / 2), y + int(h /2)])
+        face_center = np.array([x + int(w / 2), y + int(h /2), w])
         drawFacePosition(img, face_center, (w, h))
 
-    return img, unit_vector
+        pixel_dist = (face_center - img_center)
+        abs_dist = np.absolute(pixel_dist)
+        if np.any(abs_dist > tol / 2):
+            unit_dist = pixel_dist / np.linalg.norm(pixel_dist)
+            unit_dist[1] = -1 * unit_dist[1]
+            unit_dist[2] = -1 * unit_dist[2]
+            unit_dist = np.append(unit_dist, [0], axis=0)
 
-
-    
+    return img, unit_dist
 
 
 def manualCommand(img:np.ndarray):
