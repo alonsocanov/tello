@@ -43,6 +43,13 @@ def drawObjectPosition(img:np.ndarray, pos:tuple, radius:float):
     cv2.circle(img, pixel, int(radius), green, thickness)
     cv2.circle(img, pixel, 1, red, thickness)
 
+def drawFacePosition(img:np.ndarray, pos:np.ndarray, dim:tuple):
+    x_min, y_min = pos[0] - int(dim[0] / 2), pos[1] - int(dim[1] / 2)
+    x_max, y_max = pos[0] + int(dim[0] / 2), pos[1] + int(dim[1] / 2)
+    thickness = 3
+    blue = (255, 0, 0)
+    cv2.rectangle(img, (x_min, y_min), (x_max, y_max), blue, thickness)
+
 def velocityChange(unit_vector:np.ndarray, scale:int = 40):
     return (unit_vector * scale).astype(int).tolist()
 
@@ -81,7 +88,26 @@ def colorTracking(img:np.ndarray):
     return img, unit_dist
 
 def HaarFaceTracking(img:np.ndarray):
-    pass
+    face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+
+    width, height = imgResizeDimension(img)
+    img = cv2.resize(img, (width, height))
+    img_center = imgCenter((width, height))
+    tol = tolerance((width, height))
+    drawTolerance(img, tol)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray)
+    unit_vector = np.array([0, 0, 0, 0])
+    if faces:
+        idx_max_area = np.argmax(faces[:, 2] * faces[:, 3])
+        x, y, w, h = faces[idx_max_area, :]
+        face_center = np.array([x + int(w / 2), y + int(h /2)])
+        drawFacePosition(img, face_center, (w, h))
+
+    return img, unit_vector
+
+
+    
 
 
 def manualCommand(img:np.ndarray):
