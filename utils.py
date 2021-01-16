@@ -1,3 +1,9 @@
+import cv2
+import imutils
+import numpy as np
+import sys
+
+
 # color normalization of HSV to OpenCV HSV
 def hsv2cvhsv(hsv: np.array) -> np.array:
     # For HSV, Hue range is [0,179], Saturation range is [0,255]
@@ -37,7 +43,7 @@ def drawObjectPosition(img, pos, radius):
     cv2.circle(img, pixel, int(radius), green, thickness)
     cv2.circle(img, pixel, 1, red, thickness)
 
-def velocityChange(unit_vector, scale=70):
+def velocityChange(unit_vector, scale=40):
     unit_vector[1] = -1 * unit_vector[1]
     unit_vector[2] = -1 * unit_vector[2]
     return (unit_vector * scale).astype(int).tolist()
@@ -69,9 +75,7 @@ def colorTracking(img):
         if r > .05 * height:
             drawObjectPosition(img, (x, y), r)
             pixel_dist = (obj_pos - img_center)
-            
-            
-            # pixel_dist[0] = -1 * pixel_dist[0]
+                        
             abs_dist = np.absolute(pixel_dist)
             if np.any(abs_dist > tol / 2):
                 unit_dist = pixel_dist / np.linalg.norm(pixel_dist)

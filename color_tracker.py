@@ -1,15 +1,7 @@
 from djitellopy import Tello
 import cv2
-import imutils
 import numpy as np
-import sys
-from utils import hsv2cvhsv, tolerance, imgCenter, imgDimensions, drawTolerance, drawObjectPosition, velocityChange, colorTracking
-
-
-
-
-
-
+from utils import velocityChange, colorTracking
 
 
 
