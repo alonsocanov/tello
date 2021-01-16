@@ -1,13 +1,17 @@
 from djitellopy import Tello
 import cv2
-import numpy as np
+import argparse
 from utils import velocityChange, colorTracking
 
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('track', type='str', help="Write the kind of tracking 'color' or 'face' or manual")
+    parser.add_argument('takeoff', type=bool, help='True to takeoff False to just show video feed')
+    args = parser.parse_args()
 
-    start_counter = 0
+    takeoff = args.takeoff
 
     drone = Tello()
     if not drone.connect():
@@ -36,14 +40,22 @@ def main():
     fontColor = (255, 255, 255)
     lineType = 2
 
-    unit_dist = np.array([0, 0, 0])
     
 
     while True:
         frame_read = drone.get_frame_read()
         frame = frame_read.frame
 
-        img, unit_vector = colorTracking(frame)
+        if args.track == 'color':
+            img, unit_vector = colorTracking(frame)
+        elif args.track == 'face':
+            img, unit_vector = HaarFaceTracking(frame)
+        elif args.track == 'manual':
+            img, unit_vector = manualCommand(frame)
+        elif args.track == 'command':
+            pass
+        else:
+            pass
         
         forward_back_velocity = 0
         left_right_velocity = 0
@@ -51,18 +63,14 @@ def main():
         yaw_velocity = 0
         
         
-        if start_counter == 0:
+        if not takeoff:
             drone.takeoff()
-            start_counter = 1
+            takeoff = True
         try:
-            yaw_velocity, up_down_velocity, forward_backward_velocity = velocityChange(unit_vector)
+            yaw_velocity, up_down_velocity, forward_backward_velocity, left_right_velocity = velocityChange(unit_vector)
             drone.send_rc_control(left_right_velocity, forward_backward_velocity, up_down_velocity, yaw_velocity)
         except TypeError:
-            forward_back_velocity = 0
-            left_right_velocity = 0
-            up_down_velocity = 0
-            yaw_velocity = 0
-            drone.send_rc_control(left_right_velocity, forward_backward_velocity, up_down_velocity, yaw_velocity)
+            drone.send_rc_control(0, 0, 0, 0)
         
         cv2.imshow(win_name, img)
 
