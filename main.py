@@ -1,13 +1,14 @@
 from djitellopy import Tello
 import cv2
 import argparse
+import sys
 from utils import velocityChange, colorTracking
 
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('track', type='str', help="Write the kind of tracking 'color' or 'face' or manual")
+    parser.add_argument('track', type=str, help="Write the kind of tracking 'color' or 'face' or manual")
     parser.add_argument('takeoff', type=bool, help='True to takeoff False to just show video feed')
     args = parser.parse_args()
 
