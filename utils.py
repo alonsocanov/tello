@@ -38,7 +38,7 @@ def drawTolerance(img:np.ndarray, tolerance:np.ndarray):
 def drawObjectPosition(img:np.ndarray, pos:tuple, radius:float):
     red = (0, 0, 255)
     green = (0, 255, 0)
-    thickness = 4
+    thickness = 2
     pixel = (int(pos[0]), int(pos[1]))
     cv2.circle(img, pixel, int(radius), green, thickness)
     cv2.circle(img, pixel, 1, red, thickness)
@@ -46,9 +46,11 @@ def drawObjectPosition(img:np.ndarray, pos:tuple, radius:float):
 def drawFacePosition(img:np.ndarray, pos:np.ndarray, dim:tuple):
     x_min, y_min = pos[0] - int(dim[0] / 2), pos[1] - int(dim[1] / 2)
     x_max, y_max = pos[0] + int(dim[0] / 2), pos[1] + int(dim[1] / 2)
-    thickness = 3
+    thickness = 2
     blue = (255, 0, 0)
+    red = (0, 0, 255)
     cv2.rectangle(img, (x_min, y_min), (x_max, y_max), blue, thickness)
+    cv2.circle(img, (pos[0], pos[1]), 1, red, thickness)
 
 def velocityChange(unit_vector:np.ndarray, scale:int = 40):
     return (unit_vector * scale).astype(int).tolist()
@@ -98,7 +100,8 @@ def HaarFaceTracking(img:np.ndarray):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray)
     unit_dist = np.array([0, 0, 0, 0])
-    if faces:
+    print(faces, type(faces))
+    if isinstance(faces, np.ndarray):
         idx_max_area = np.argmax(faces[:, 2] * faces[:, 3])
         x, y, w, h = faces[idx_max_area, :]
         face_center = np.array([x + int(w / 2), y + int(h /2), w])
