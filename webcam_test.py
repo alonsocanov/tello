@@ -15,10 +15,11 @@ def main():
     if not webcam.isOpened():
         webcam.release()
         sys.exit("Error opening webcam")
+    ret, frame = webcam.read()
+    if not ret:
+        webcam = cv2.VideoCapture(1)
+        ret, frame = webcam.read()
 
-
-
-    
 
 
     win_name = 'Frame'
@@ -30,9 +31,6 @@ def main():
     fontColor = (255, 255, 255)
     lineType = 2
 
-    
-
-
     while webcam.isOpened():
         ret, frame = webcam.read()
 
@@ -43,7 +41,7 @@ def main():
 
         yaw_velocity, up_down_velocity, forward_backward_velocity, left_right_velocity = velocityChange(unit_vector)
         print(yaw_velocity, up_down_velocity, forward_backward_velocity, left_right_velocity)
-       
+
 
         cv2.imshow(win_name, img)
         key = cv2.waitKey(1) & 0xFF

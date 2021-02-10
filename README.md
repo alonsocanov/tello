@@ -11,9 +11,6 @@ The files included are:
 - webcam_test.py
 - haarcascade_frontalface_default.xml
 
-
-
-
 ## Libraries
 
 - numpy
@@ -29,4 +26,4 @@ To be able to control the DJI Tello drone first the computer must be connected t
 
 ## Usage
 
-In order to use the scripts the python interpreter mus be called first then the main script 
+In order to use the scripts the python interpreter mus be called first then the main script
