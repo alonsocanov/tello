@@ -19,14 +19,14 @@ def main():
         print('Unable to connecrt with drone')
         sys.exit(0)
 
-    
+
     forward_back_velocity = 0
     left_right_velocity = 0
     up_down_velocity = 0
     yaw_velocity = 0
     speed = 0
 
-    
+
     print(drone.get_battery().strip('dm\r\n'))
 
     drone.streamoff()
@@ -41,7 +41,7 @@ def main():
     fontColor = (255, 255, 255)
     lineType = 2
 
-    
+
 
     while True:
         frame_read = drone.get_frame_read()
@@ -57,13 +57,13 @@ def main():
             pass
         else:
             pass
-        
+
         forward_back_velocity = 0
         left_right_velocity = 0
         up_down_velocity = 0
         yaw_velocity = 0
-        
-        
+
+
         if not takeoff:
             drone.takeoff()
             takeoff = True
@@ -72,7 +72,7 @@ def main():
             drone.send_rc_control(left_right_velocity, forward_backward_velocity, up_down_velocity, yaw_velocity)
         except TypeError:
             drone.send_rc_control(0, 0, 0, 0)
-        
+
         cv2.imshow(win_name, img)
 
         key = cv2.waitKey(1) & 0xFF

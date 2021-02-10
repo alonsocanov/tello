@@ -46,9 +46,9 @@ def main():
         cv2.imshow(win_name, img)
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
-            webcam.release()
-            cv2.destroyAllWindows()
             break
+    webcam.release()
+    cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     main()
