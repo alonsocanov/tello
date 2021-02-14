@@ -2,7 +2,7 @@ from djitellopy import Tello
 import cv2
 import argparse
 import sys
-from utils import velocityChange, colorTracking
+from utils import velocityChange, colorTracking, HaarFaceTracking
 
 
 
@@ -64,9 +64,9 @@ def main():
         yaw_velocity = 0
 
 
-        if not takeoff:
+        if takeoff:
             drone.takeoff()
-            takeoff = True
+            takeoff = False
         try:
             yaw_velocity, up_down_velocity, forward_backward_velocity, left_right_velocity = velocityChange(unit_vector)
             drone.send_rc_control(left_right_velocity, forward_backward_velocity, up_down_velocity, yaw_velocity)

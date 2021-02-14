@@ -122,7 +122,6 @@ def HaarFaceTracking(img:np.ndarray):
 
         dist = face_center - img_center
         abs_dist = np.absolute(dist)
-        print(tolerance, abs_dist)
         if np.any(abs_dist > tolerance):
             unit_dist = dist / np.linalg.norm(dist)
             unit_dist[1] = -1 * unit_dist[1]
